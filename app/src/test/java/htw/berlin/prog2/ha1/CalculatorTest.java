@@ -1,5 +1,6 @@
 package htw.berlin.prog2.ha1;
 //@author Deniz-Goel
+//finish
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
