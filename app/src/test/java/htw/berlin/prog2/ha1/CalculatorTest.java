@@ -108,6 +108,41 @@ class CalculatorTest {
 
         assertEquals(expected, actual);
     }
+    @Test
+    @DisplayName("should display a negative number")
+    void testNegativeDigit() {
+        Calculator calc = new Calculator();
+
+        calc.pressNegativeKey();
+        calc.pressDigitKey(5);
+
+        String expected = "-5";
+        String actual = calc.readScreen();
+
+        assertEquals(expected, actual);
+    }
+    @Test
+    @DisplayName("should display result after adding two positive multi-digit numbers and pressing equal sign again")
+    void testMultiplePositiveAddition() {
+        Calculator calc = new Calculator();
+
+        calc.pressDigitKey(2);
+        calc.pressBinaryOperationKey("+");
+        calc.pressDigitKey(3);
+        calc.pressEqualsKey();
+
+        String expected1 = "5";
+        String actual1 = calc.readScreen();
+
+        assertEquals(expected1, actual1);
+
+        calc.pressEqualsKey();
+
+        String expected2 = "8";
+        String actual2 = calc.readScreen();
+
+        assertEquals(expected2, actual2);
+    }
 
 
 
