@@ -13,6 +13,11 @@ public class Calculator {
     private double latestValue;
 
     private String latestOperation = "";
+    private int count = 0;
+
+    private boolean isNegative = false;
+
+
 
     /**
      * @return den aktuellen Bildschirminhalt als String
@@ -29,10 +34,11 @@ public class Calculator {
      * @param digit Die Ziffer, deren Taste gedrückt wurde
      */
     public void pressDigitKey(int digit) {
+        count = count + 1;
         if(digit > 9 || digit < 0) throw new IllegalArgumentException();
 
         if(screen.equals("0") || latestValue == Double.parseDouble(screen)) screen = "";
-
+        if(isNegative) screen = "-";
         screen = screen + digit;
     }
 
@@ -45,6 +51,7 @@ public class Calculator {
      * im Ursprungszustand ist.
      */
     public void pressClearKey() {
+        count = 0;
         screen = "0";
         latestOperation = "";
         latestValue = 0.0;
@@ -105,10 +112,17 @@ public class Calculator {
      * entfernt und der Inhalt fortan als positiv interpretiert.
      */
     public void pressNegativeKey() {
+        count = count + 1;
+
+        if(count == 1)isNegative = true;
         screen = screen.startsWith("-") ? screen.substring(1) : "-" + screen;
     }
 
     /**
+     *   Der letzte Operand (`lastOperand`) wird gespeichert, sobald "=" zum ersten Mal nach
+     *   einer Operation gedrückt wird. Dieser Operand wird bei weiterer Addition-Berechnung verwendet.
+     *  `latestValue` speichert das letzte Berechnungsergebnis, damit die Wiederholung der
+     *  letzten Operation mit dem `lastOperand` möglich ist.
      * Empfängt den Befehl der gedrückten "="-Taste.
      * Wurde zuvor keine Operationstaste gedrückt, passiert nichts.
      * Wurde zuvor eine binäre Operationstaste gedrückt und zwei Operanden eingegeben, wird das
@@ -117,15 +131,23 @@ public class Calculator {
      * Operation (ggf. inklusive letztem Operand) erneut auf den aktuellen Bildschirminhalt angewandt
      * und das Ergebnis direkt angezeigt.
      */
+    private Double lastOperand = null;
     public void pressEqualsKey() {
-        var result = switch(latestOperation) {
-            case "+" -> latestValue + Double.parseDouble(screen);
+        double currentScreenValue = Double.parseDouble(screen);
+        if (latestOperation.isEmpty()) return;
+        if (lastOperand == null) {
+            lastOperand = currentScreenValue;
+        }
+
+        double result = switch(latestOperation) {
+            case "+" -> latestValue + lastOperand;
             case "-" -> latestValue - Double.parseDouble(screen);
             case "x" -> latestValue * Double.parseDouble(screen);
             case "/" -> latestValue / Double.parseDouble(screen);
             default -> throw new IllegalArgumentException();
         };
         screen = Double.toString(result);
+        latestValue = result;
         if(screen.equals("Infinity")) screen = "Error";
         if(screen.endsWith(".0")) screen = screen.substring(0,screen.length()-2);
         if(screen.contains(".") && screen.length() > 11) screen = screen.substring(0, 10);
